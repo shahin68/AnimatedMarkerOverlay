@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="CanvasOverlay">
+        <attr name="markerColor" format="color"/>
+        <attr name="markerMinimumRadius" format="dimension"/>
+        <attr name="markerMaximumRadius" format="dimension"/>
+    </declare-styleable>
+    <declare-styleable name="BitmapOverlay">
+        <attr name="src" format="reference"/>
+        <attr name="minimumSize" format="dimension"/>
+        <attr name="minimumSizeInheritFromSrc" format="boolean"/>
+        <attr name="maximumSize" format="dimension"/>
+    </declare-styleable>
+</resources>
