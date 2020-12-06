@@ -1,4 +1,4 @@
-package com.shahin.overlay
+package com.marker.overlay
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.marker.overlay.test", appContext.packageName)
+        assertEquals("com.marker.overlay", appContext.packageName)
     }
 }

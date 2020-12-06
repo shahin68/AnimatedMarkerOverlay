@@ -1,4 +1,4 @@
-package com.shahin.overlay.ui.fragments
+package com.marker.overlay.ui.fragments
 
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment

@@ -1,4 +1,4 @@
-package com.marker.overlay
+package com.shahin.overlay
 
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
@@ -8,7 +8,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.animation.DecelerateInterpolator
 import androidx.core.content.ContextCompat
-import com.marker.overlay.R
+import com.shahin.overlay.R
 
 @SuppressLint("CustomViewStyleable")
 class CanvasOverlay @JvmOverloads constructor(

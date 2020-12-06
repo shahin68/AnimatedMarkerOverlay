@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.shahin.overlay.ui.fragments.main.HomeFragment"
+        android:name="com.marker.overlay.ui.fragments.main.HomeFragment"
         android:label="Home"
         tools:layout="@layout/home_fragment">
     </fragment>

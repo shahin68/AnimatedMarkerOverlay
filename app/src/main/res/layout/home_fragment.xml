@@ -17,14 +17,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.marker.overlay.CanvasOverlay
+    <com.shahin.overlay.CanvasOverlay
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:markerColor="@color/black"
         app:markerMinimumRadius="0dp"
         app:markerMaximumRadius="48dp"/>
 
-    <com.marker.overlay.BitmapOverlay
+    <com.shahin.overlay.BitmapOverlay
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:src="@drawable/ic_marker"

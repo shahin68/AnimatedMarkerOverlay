@@ -1,4 +1,4 @@
-package com.shahin.overlay.ui.fragments.main
+package com.marker.overlay.ui.fragments.main
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -11,9 +11,9 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.viewModels
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
-import com.shahin.overlay.R
-import com.shahin.overlay.databinding.HomeFragmentBinding
-import com.shahin.overlay.ui.fragments.BaseFragment
+import com.marker.overlay.R
+import com.marker.overlay.databinding.HomeFragmentBinding
+import com.marker.overlay.ui.fragments.BaseFragment
 
 const val FINE_LOCATION_PERMISSION = 100
 class HomeFragment : BaseFragment<HomeFragmentBinding>(R.layout.home_fragment), OnMapReadyCallback {
