@@ -10,5 +10,15 @@
         android:name="com.marker.overlay.ui.fragments.home.HomeFragment"
         android:label="Home"
         tools:layout="@layout/home_fragment">
+        <action
+            android:id="@+id/action_homeFragment_to_clusterFragment"
+            app:destination="@id/clusterFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/clusterFragment"
+        android:name="com.marker.overlay.ui.fragments.cluster.ClusterFragment"
+        android:label="Cluster"
+        tools:layout="@layout/cluster_fragment">
     </fragment>
 </navigation>

@@ -125,7 +125,9 @@ class CanvasOverlay @JvmOverloads constructor(
     }
 
     fun start() {
-        valueAnimator.start()
+        if (mPoints.isNotEmpty()) {
+            valueAnimator.start()
+        }
     }
 
     fun pause() {

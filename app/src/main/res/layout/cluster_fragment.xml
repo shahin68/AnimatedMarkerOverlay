@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipChildren="false"
+    tools:context=".ui.fragments.home.HomeFragment">
+
+    <fragment
+        android:id="@+id/cluster_map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/linear"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <com.shahin.overlay.CanvasOverlay
+        android:id="@+id/canvas_overlay"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:markerColor="@color/black"
+        app:markerMaximumRadius="48dp"
+        app:markerMinimumRadius="0dp"
+        app:layout_constraintBottom_toBottomOf="@+id/map_view"
+        app:layout_constraintEnd_toEndOf="@+id/map_view"
+        app:layout_constraintStart_toStartOf="@+id/map_view"
+        app:layout_constraintTop_toTopOf="@+id/map_view"/>
+
+    <com.shahin.overlay.BitmapOverlay
+        android:id="@+id/bitmap_overlay"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:maximumSize="48dp"
+        app:minimumSize="0dp"
+        app:minimumSizeInheritFromSrc="true"
+        app:src="@drawable/ic_marker"
+        app:layout_constraintBottom_toBottomOf="@+id/map_view"
+        app:layout_constraintEnd_toEndOf="@+id/map_view"
+        app:layout_constraintStart_toStartOf="@+id/map_view"
+        app:layout_constraintTop_toTopOf="@+id/map_view"/>
+
+    <LinearLayout
+        android:id="@+id/linear"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <Button
+            android:id="@+id/canvas_btn"
+            style="@style/Widget.AppCompat.Button.Borderless.Colored"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Draw"
+            android:textColor="?attr/colorOnSecondary" />
+
+        <Button
+            android:id="@+id/bitmap_btn"
+            style="@style/Widget.AppCompat.Button.Borderless.Colored"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Bitmap"
+            android:textColor="?attr/colorOnSecondary" />
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

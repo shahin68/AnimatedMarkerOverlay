@@ -1,8 +1,8 @@
-package com.marker.overlay.ui.fragments.home
+package com.marker.overlay.ui.fragments.cluster
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Context.LOCATION_SERVICE
+import android.content.Context
 import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.Bundle
@@ -10,44 +10,50 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
-import androidx.navigation.fragment.findNavController
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.Marker
+import com.google.maps.android.clustering.ClusterItem
+import com.google.maps.android.clustering.ClusterManager
 import com.marker.overlay.R
 import com.marker.overlay.data.models.MarkerType
-import com.marker.overlay.databinding.HomeFragmentBinding
+import com.marker.overlay.databinding.ClusterFragmentBinding
 import com.marker.overlay.ui.fragments.BaseFragment
+import com.marker.overlay.ui.fragments.cluster.data.ClusterMarker
+import com.marker.overlay.ui.fragments.cluster.data.MarkerClusterRenderer
+import com.marker.overlay.ui.fragments.home.FINE_LOCATION_PERMISSION
+import com.marker.overlay.ui.fragments.home.HomeViewModel
 import com.shahin.overlay.Projection
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
-const val FINE_LOCATION_PERMISSION = 100
-
-class HomeFragment : BaseFragment<HomeFragmentBinding>(R.layout.home_fragment), OnMapReadyCallback {
+class ClusterFragment : BaseFragment<ClusterFragmentBinding>(R.layout.cluster_fragment),
+    OnMapReadyCallback {
 
     private val viewModel: HomeViewModel by viewModel()
 
     private lateinit var mMap: GoogleMap
+
+    private lateinit var clusterManager: ClusterManager<ClusterItem>
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = HomeFragmentBinding.inflate(inflater, container, false)
+        _binding = ClusterFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val mapFragment = childFragmentManager.findFragmentById(R.id.map_view) as? SupportMapFragment
+        val mapFragment =
+            childFragmentManager.findFragmentById(R.id.cluster_map) as? SupportMapFragment
         mapFragment?.getMapAsync(this)
-
 
         initObservers()
 
@@ -58,47 +64,91 @@ class HomeFragment : BaseFragment<HomeFragmentBinding>(R.layout.home_fragment), 
         binding.bitmapBtn.setOnClickListener {
             fetchNewLocations(MarkerType.CANVAS_BITMAP)
         }
+    }
 
-        binding.clusterBtn.setOnClickListener {
-            findNavController().navigate(
-                HomeFragmentDirections.actionHomeFragmentToClusterFragment()
-            )
+    override fun onMapReady(googleMap: GoogleMap?) {
+        googleMap?.let {
+            mMap = it
+
+            mMap.uiSettings.apply {
+                this.isMyLocationButtonEnabled = true
+                this.isMapToolbarEnabled = false
+            }
+
+            fetchNewLocations(MarkerType.CANVAS_DRAW)
         }
     }
 
-    private fun initObservers() {
-        viewModel.locations.observe(viewLifecycleOwner, { locations ->
-            if (isAdded && ::mMap.isInitialized) {
-                locations.forEach {
-                    val marker = mMap.addMarker(
-                        MarkerOptions().position(it.latLng).anchor(0.5f, 0.5f).zIndex(111000f).icon(
-                            BitmapDescriptorFactory.fromResource(R.drawable.ic_marker)
-                        )
-                    )
-                    if (marker.isVisible) {
-                        val projection = Projection(
-                            mMap.projection.toScreenLocation(it.latLng),
-                            it.latLng
-                        )
-                        when (it.markerType) {
-                            MarkerType.CANVAS_DRAW -> {
-                                binding.canvasOverlay.set(
-                                    projection
-                                )
-                            }
-                            MarkerType.CANVAS_BITMAP -> {
-                                binding.bitmapOverlay.set(
-                                    projection
-                                )
-                            }
-                        }
+    private fun setUpCluster(latLng: LatLng, markerType: MarkerType) {
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14f))
+        clusterManager = ClusterManager(context, mMap)
+        mMap.setOnCameraIdleListener(clusterManager)
+        mMap.setOnMarkerClickListener(clusterManager)
+        viewModel.getSomeCluster(latLng, markerType)
+
+        val clusterRenderer = MarkerClusterRenderer(requireContext(), mMap, clusterManager) {
+            when (it) {
+                null -> {
+                    when (markerType) {
+                        MarkerType.CANVAS_DRAW -> binding.canvasOverlay.clear()
+                        MarkerType.CANVAS_BITMAP -> binding.bitmapOverlay.clear()
                     }
                 }
+                is ClusterItem -> {
+                    when (markerType) {
+                        MarkerType.CANVAS_DRAW -> binding.canvasOverlay.set(
+                            Projection(
+                                mMap.projection.toScreenLocation(
+                                    it.position
+                                ), it.position
+                            )
+                        )
+                        MarkerType.CANVAS_BITMAP -> binding.bitmapOverlay.set(
+                            Projection(
+                                mMap.projection.toScreenLocation(
+                                    it.position
+                                ), it.position
+                            )
+                        )
+                    }
+                }
+                is Marker -> {
+                    when (markerType) {
+                        MarkerType.CANVAS_DRAW -> binding.canvasOverlay.move(
+                            Projection(
+                                mMap.projection.toScreenLocation(
+                                    it.position
+                                ), it.position
+                            )
+                        )
+                        MarkerType.CANVAS_BITMAP -> binding.bitmapOverlay.move(
+                            Projection(
+                                mMap.projection.toScreenLocation(
+                                    it.position
+                                ), it.position
+                            )
+                        )
+                    }
+                }
+            }
+        }
+        clusterManager.renderer = clusterRenderer
+    }
+
+    private fun initObservers() {
+        viewModel.clusterLocations.observe(viewLifecycleOwner, { locations ->
+            if (isAdded && ::mMap.isInitialized) {
+                locations.forEach {
+                    clusterManager.addItem(it)
+                }
+                clusterManager.cluster()
+
+
                 mMap.setOnCameraMoveListener {
                     locations.forEach {
                         val projection = Projection(
-                            mMap.projection.toScreenLocation(it.latLng),
-                            it.latLng
+                            mMap.projection.toScreenLocation(it.position),
+                            it.position
                         )
                         when (it.markerType) {
                             MarkerType.CANVAS_DRAW -> {
@@ -116,19 +166,6 @@ class HomeFragment : BaseFragment<HomeFragmentBinding>(R.layout.home_fragment), 
                 }
             }
         })
-    }
-
-    override fun onMapReady(googleMap: GoogleMap?) {
-        googleMap?.let {
-            mMap = it
-
-            mMap.uiSettings.apply {
-                this.isMyLocationButtonEnabled = true
-                this.isMapToolbarEnabled = false
-            }
-
-            fetchNewLocations(MarkerType.CANVAS_DRAW)
-        }
     }
 
     private fun fetchNewLocations(markerType: MarkerType) {
@@ -157,8 +194,7 @@ class HomeFragment : BaseFragment<HomeFragmentBinding>(R.layout.home_fragment), 
                 mMap.clear()
                 mMap.isMyLocationEnabled = true
                 getCurrentLocation()?.let { latLng ->
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14f))
-                    viewModel.getSomeLocations(latLng, markerType)
+                    setUpCluster(latLng, markerType)
                 }
             }
         }
@@ -175,7 +211,8 @@ class HomeFragment : BaseFragment<HomeFragmentBinding>(R.layout.home_fragment), 
 
     @SuppressLint("MissingPermission")
     private fun getCurrentLocation(): LatLng? {
-        val locationManager = requireContext().getSystemService(LOCATION_SERVICE) as LocationManager
+        val locationManager =
+            requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
         val location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
         return if (location != null) {
             LatLng(location.latitude, location.longitude)

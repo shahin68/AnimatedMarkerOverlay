@@ -16,7 +16,6 @@ class BitmapOverlay @JvmOverloads constructor(
 
     private val mPaint: Paint = Paint()
     private var mPoints = arrayListOf<Projection>()
-    private var circularPaths = mutableListOf<Path>()
 
     private var maxSize = resources.getDimension(R.dimen.dimen48)
     private var inheritFromSrc = false
@@ -62,11 +61,6 @@ class BitmapOverlay @JvmOverloads constructor(
         mPoints.forEachIndexed { index, projection ->
             val circleCenterX = projection.point.x.toFloat()
             val circleCenterY = projection.point.y.toFloat()
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                canvas?.clipOutPath(circularPaths[index])
-            } else {
-                canvas?.clipPath(circularPaths[index], Region.Op.DIFFERENCE)
-            }
             canvas?.drawCircle(circleCenterX, circleCenterY, dynamicSize, mPaint)
         }
         //endregion
@@ -81,7 +75,6 @@ class BitmapOverlay @JvmOverloads constructor(
         }
         if (oldProjection == null) {
             mPoints.add(Projection(projection.point, projection.latLng))
-            addCutterPath(projection)
         } else {
             var pos = -1
             mPoints.forEachIndexed { index, projectionItem ->
@@ -91,16 +84,13 @@ class BitmapOverlay @JvmOverloads constructor(
             }
             if (pos != -1) {
                 mPoints.removeAt(pos)
-                circularPaths.removeAt(pos)
                 mPoints.add(Projection(projection.point, projection.latLng))
-                addCutterPath(projection)
             }
         }
         invalidate()
     }
 
     fun clear() {
-        circularPaths.clear()
         mPoints.clear()
         invalidate()
     }
@@ -118,9 +108,7 @@ class BitmapOverlay @JvmOverloads constructor(
             }
             if (pos != -1) {
                 mPoints.removeAt(pos)
-                circularPaths.removeAt(pos)
                 mPoints.add(Projection(projection.point, projection.latLng))
-                addCutterPath(projection)
                 invalidate()
             }
         }
@@ -128,19 +116,13 @@ class BitmapOverlay @JvmOverloads constructor(
     }
 
     fun start() {
-        valueAnimator.start()
+        if (mPoints.isNotEmpty()) {
+            valueAnimator.start()
+        }
     }
 
     fun pause() {
         valueAnimator.pause()
-    }
-
-    private fun addCutterPath(projection: Projection) {
-        val path = Path()
-        val circleCenterX = projection.point.x.toFloat()
-        val circleCenterY = projection.point.y.toFloat()
-        path.addCircle(circleCenterX, circleCenterY, minSize, Path.Direction.CCW)
-        circularPaths.add(path)
     }
 
 }
