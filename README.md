@@ -10,7 +10,7 @@ You can animate lot's of markers however you want.
 
 ## Usage
 
-Add the layouts on top of your map view
+Add the layouts on top of your map view. Better to have the overlay match your map view boundaries.
 
 ```xml
 <fragment
@@ -54,7 +54,7 @@ Add the layouts on top of your map view
 
 * `minimumSizeInheritFromSrc` set `true` if your want to inherit minimum size from the bitmap itself
 
-* `src` to set our image (Note: .png or . jpg - not .xml drawable)
+* `src` to set your image as marker (Note: use .png or .jpg - not .xml drawable)
 
 
 **In your View For adding markers:**
@@ -87,7 +87,7 @@ Canvas drawings are cheap but use carefully and inspect the performace thoroughl
 
 And,
 
-**Do't forget to pause the animators when view isn't visible:**
+**Don't forget to pause the overlay animators when view isn't visible:**
 
 ```kotlin
 override fun onResume() {
@@ -102,7 +102,6 @@ override fun onStop() {
    binding.bitmapOverlay.pause()
 }
 ```
-
 
 
 Notice: To make the example work you need to add your Google Api Key `MAPS_API_KEY=AIz*******4Y` in a property file called `secure.properties` or refactor the project.
