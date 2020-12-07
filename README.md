@@ -1,6 +1,12 @@
 # MarkerOverlay
 **Animate map markers with overlay projection compatible with clustering**
 
+### What can you do with this package?
+
+You can animate lot's of markers however you want.
+
+
+
 ## Usage
 
 Add the layouts on top of your map view
@@ -32,27 +38,27 @@ Add the layouts on top of your map view
 
 *CanvasOverlay* attributes:
 
-`markerColor` to set marker color
+* `markerColor` to set marker color
 
-`markerMaximumRadius` to set maximum radius
+* `markerMaximumRadius` to set maximum radius
 
-`markerMinimumRadius` to set minumum radius
+* `markerMinimumRadius` to set minumum radius
 
 
 *BitmapOverlay* attributes:
 
-`maximumSize` to set maximum size
+* `maximumSize` to set maximum size
 
-`minimumSize` to set minimum size
+* `minimumSize` to set minimum size
 
-`minimumSizeInheritFromSrc` set `true` if your want to inherit minimum size from the bitmap itself
+* `minimumSizeInheritFromSrc` set `true` if your want to inherit minimum size from the bitmap itself
 
-`src` to set our image (Note: .png or . jpg - not .xml drawable)
+* `src` to set our image (Note: .png or . jpg - not .xml drawable)
 
 
 **In your View For adding markers:**
 
-```
+```kotlin
 val projection = Projection(mMap.projection.toScreenLocation(latLng),latLng)
 
 binding.canvasOverlay.set(projection) // to add one marker drawn
@@ -62,7 +68,7 @@ binding.bitmapOverlay.set(projection) // to add one bitmap drawn
 
 **In your View For moving markers:**
 
-```
+```kotlin
 mMap.setOnCameraMoveListener {
    binding.canvasOverlay.move(projection) // to move one marker drawn
    binding.bitmapOverlay.move(projection) // to move one bitmap drawn                 
@@ -82,7 +88,7 @@ And,
 
 **Do't forget to pause the animators when view isn't visible:**
 
-```
+```kotlin
 override fun onResume() {
    super.onResume()
    binding.canvasOverlay.start()
