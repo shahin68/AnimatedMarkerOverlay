@@ -13,8 +13,4 @@ abstract class BaseFragment<Binding : ViewBinding>(@LayoutRes contentLayoutId: I
         _binding = null
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
-    }
 }

@@ -7,7 +7,7 @@
     android:clipChildren="false"
     tools:context=".ui.fragments.main.HomeFragment">
 
-    <com.google.android.gms.maps.MapView
+    <fragment
         android:id="@+id/map_view"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="0dp"
@@ -18,6 +18,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.shahin.overlay.CanvasOverlay
+        android:id="@+id/canvas_overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:markerColor="@color/black"
@@ -25,6 +26,7 @@
         app:markerMaximumRadius="48dp"/>
 
     <com.shahin.overlay.BitmapOverlay
+        android:id="@+id/bitmap_overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:src="@drawable/ic_marker"

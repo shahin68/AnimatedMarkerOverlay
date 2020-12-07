@@ -75,24 +75,24 @@ class BitmapOverlay @JvmOverloads constructor(
 
     fun set(projection: Projection) {
 
-        val markerOptions = mPoints.map { it.point }
-        val latlng = markerOptions.find {
-            it.x == projection.point.x && it.y == projection.point.y
+        val points = mPoints.map { it.latLng }
+        val oldProjection = points.find {
+            it.latitude == projection.latLng.latitude && it.longitude == projection.latLng.longitude
         }
-        if (latlng == null) {
-            mPoints.add(Projection(projection.point))
+        if (oldProjection == null) {
+            mPoints.add(Projection(projection.point, projection.latLng))
             addCutterPath(projection)
         } else {
             var pos = -1
-            mPoints.forEachIndexed { index, proj ->
-                if (proj.point.x == latlng.x && proj.point.y == latlng.y) {
+            mPoints.forEachIndexed { index, projectionItem ->
+                if (projectionItem.latLng.latitude == oldProjection.latitude && projectionItem.latLng.longitude == oldProjection.longitude) {
                     pos = index
                 }
             }
             if (pos != -1) {
                 mPoints.removeAt(pos)
                 circularPaths.removeAt(pos)
-                mPoints.add(Projection(projection.point))
+                mPoints.add(Projection(projection.point, projection.latLng))
                 addCutterPath(projection)
             }
         }
@@ -106,20 +106,20 @@ class BitmapOverlay @JvmOverloads constructor(
     }
 
     fun move(projection: Projection) {
-        val proj = mPoints.find {
-            it.point.x == projection.point.x && it.point.y == projection.point.y
+        val oldProjection = mPoints.find {
+            it.latLng.latitude == projection.latLng.latitude && it.latLng.longitude == projection.latLng.longitude
         }
-        if (proj != null) {
+        if (oldProjection != null) {
             var pos = -1
-            mPoints.forEachIndexed { index, p ->
-                if (p.point.x == proj.point.x && p.point.y == proj.point.y) {
+            mPoints.forEachIndexed { index, projectedItem ->
+                if (projectedItem.latLng.latitude == oldProjection.latLng.latitude && projectedItem.latLng.longitude == oldProjection.latLng.longitude) {
                     pos = index
                 }
             }
             if (pos != -1) {
                 mPoints.removeAt(pos)
                 circularPaths.removeAt(pos)
-                mPoints.add(Projection(projection.point))
+                mPoints.add(Projection(projection.point, projection.latLng))
                 addCutterPath(projection)
                 invalidate()
             }
