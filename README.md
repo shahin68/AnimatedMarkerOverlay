@@ -5,7 +5,8 @@
 
 You can animate lot's of markers however you want.
 
-
+<img src="screens/1.mp4" width="200" /> <img src="screens/2.mp4" width="200" />
+<img src="screens/3.mp4" width="200" /> <img src="screens/4.mp4" width="200" />
 
 ## Usage
 
@@ -101,6 +102,7 @@ override fun onStop() {
    binding.bitmapOverlay.pause()
 }
 ```
+
 
 
 Notice: To make the example work you need to add your Google Api Key `MAPS_API_KEY=AIz*******4Y` in a property file called `secure.properties` or refactor the project.
