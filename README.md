@@ -83,7 +83,7 @@ mMap.setOnCameraMoveListener {
 }
 ```
 
-Canvas drawings are cheap but use carefully and inspect the performace thoroughly.
+Canvas drawings are cheap but be careful and inspect the performace meticulously.
 
 And,
 
