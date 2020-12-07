@@ -1,4 +1,4 @@
-package com.marker.overlay.ui.fragments.main
+package com.marker.overlay.ui.fragments.home
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -18,6 +18,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.marker.overlay.R
+import com.marker.overlay.data.models.MarkerType
 import com.marker.overlay.databinding.HomeFragmentBinding
 import com.marker.overlay.ui.fragments.BaseFragment
 import com.shahin.overlay.Projection
@@ -25,6 +26,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 const val FINE_LOCATION_PERMISSION = 100
+
 class HomeFragment : BaseFragment<HomeFragmentBinding>(R.layout.home_fragment), OnMapReadyCallback {
 
     private val viewModel: HomeViewModel by viewModel()
@@ -42,37 +44,72 @@ class HomeFragment : BaseFragment<HomeFragmentBinding>(R.layout.home_fragment), 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val mapFragment = childFragmentManager.findFragmentById(R.id.map_view) as? SupportMapFragment
+        val mapFragment =
+            childFragmentManager.findFragmentById(R.id.map_view) as? SupportMapFragment
         mapFragment?.getMapAsync(this)
 
 
+        initObservers()
+
+        binding.canvasBtn.setOnClickListener {
+            fetchNewLocations(MarkerType.CANVAS_DRAW)
+        }
+
+        binding.bitmapBtn.setOnClickListener {
+            fetchNewLocations(MarkerType.CANVAS_BITMAP)
+        }
+
+        binding.clusterBtn.setOnClickListener {
+
+        }
+    }
+
+    private fun initObservers() {
         viewModel.locations.observe(viewLifecycleOwner, { locations ->
             if (isAdded && ::mMap.isInitialized) {
                 locations.forEach {
                     val marker = mMap.addMarker(
-                        MarkerOptions().position(it).anchor(0.5f, 0.5f).zIndex(111000f).icon(
+                        MarkerOptions().position(it.latLng).anchor(0.5f, 0.5f).zIndex(111000f).icon(
                             BitmapDescriptorFactory.fromResource(R.drawable.ic_marker)
                         )
                     )
                     if (marker.isVisible) {
                         val projection = Projection(
-                            mMap.projection.toScreenLocation(it),
-                            it
+                            mMap.projection.toScreenLocation(it.latLng),
+                            it.latLng
                         )
-                        binding.canvasOverlay.set(
-                            projection
-                        )
+                        when (it.markerType) {
+                            MarkerType.CANVAS_DRAW -> {
+                                binding.canvasOverlay.set(
+                                    projection
+                                )
+                            }
+                            MarkerType.CANVAS_BITMAP -> {
+                                binding.bitmapOverlay.set(
+                                    projection
+                                )
+                            }
+                        }
                     }
                 }
                 mMap.setOnCameraMoveListener {
                     locations.forEach {
                         val projection = Projection(
-                            mMap.projection.toScreenLocation(it),
-                            it
+                            mMap.projection.toScreenLocation(it.latLng),
+                            it.latLng
                         )
-                        binding.canvasOverlay.move(
-                            projection
-                        )
+                        when (it.markerType) {
+                            MarkerType.CANVAS_DRAW -> {
+                                binding.canvasOverlay.move(
+                                    projection
+                                )
+                            }
+                            MarkerType.CANVAS_BITMAP -> {
+                                binding.bitmapOverlay.move(
+                                    projection
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -88,28 +125,39 @@ class HomeFragment : BaseFragment<HomeFragmentBinding>(R.layout.home_fragment), 
                 this.isMapToolbarEnabled = false
             }
 
+            fetchNewLocations(MarkerType.CANVAS_DRAW)
+        }
+    }
 
-            if (ActivityCompat.checkSelfPermission(
-                    requireContext(),
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                    requireContext(),
+    private fun fetchNewLocations(markerType: MarkerType) {
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)
+            requestPermissions(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.ACCESS_COARSE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)
-                requestPermissions(
-                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
-                    FINE_LOCATION_PERMISSION
-                )
-                return
-            }
-
-            mMap.isMyLocationEnabled = true
-
-            getCurrentLocation()?.let { latLng ->
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14f))
-                viewModel.getSomeLocations(latLng)
+                ),
+                FINE_LOCATION_PERMISSION
+            )
+            return
+        }
+        if (isAdded) {
+            binding.canvasOverlay.clear()
+            binding.bitmapOverlay.clear()
+            if (::mMap.isInitialized) {
+                mMap.clear()
+                mMap.isMyLocationEnabled = true
+                getCurrentLocation()?.let { latLng ->
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14f))
+                    viewModel.getSomeLocations(latLng, markerType)
+                }
             }
         }
     }
@@ -120,26 +168,7 @@ class HomeFragment : BaseFragment<HomeFragmentBinding>(R.layout.home_fragment), 
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.checkSelfPermission(
-                    requireContext(),
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                    requireContext(),
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-
-                if (::mMap.isInitialized) {
-                    mMap.isMyLocationEnabled = true
-                }
-
-                getCurrentLocation()?.let { latLng ->
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14f))
-                    viewModel.getSomeLocations(latLng)
-                }
-            }
-        }
+        fetchNewLocations(MarkerType.CANVAS_DRAW)
     }
 
     @SuppressLint("MissingPermission")
