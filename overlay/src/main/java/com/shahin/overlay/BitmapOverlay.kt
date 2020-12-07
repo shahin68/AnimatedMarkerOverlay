@@ -116,9 +116,7 @@ class BitmapOverlay @JvmOverloads constructor(
     }
 
     fun start() {
-        if (mPoints.isNotEmpty()) {
-            valueAnimator.start()
-        }
+        valueAnimator.start()
     }
 
     fun pause() {
