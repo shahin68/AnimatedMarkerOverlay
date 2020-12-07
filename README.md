@@ -101,3 +101,6 @@ override fun onStop() {
    binding.bitmapOverlay.pause()
 }
 ```
+
+
+Notice: To make the example work you need to add your Google Api Key `MAPS_API_KEY=AIz*******4Y` in a property file called `secure.properties` or refactor the project.
