@@ -48,3 +48,50 @@ Add the layouts on top of your map view
 `minimumSizeInheritFromSrc` set `true` if your want to inherit minimum size from the bitmap itself
 
 `src` to set our image (Note: .png or . jpg - not .xml drawable)
+
+
+**In your View For adding markers:**
+
+```
+val projection = Projection(mMap.projection.toScreenLocation(latLng),latLng)
+
+binding.canvasOverlay.set(projection) // to add one marker drawn
+                            
+binding.bitmapOverlay.set(projection) // to add one bitmap drawn
+```
+
+**In your View For moving markers:**
+
+```
+mMap.setOnCameraMoveListener {
+   binding.canvasOverlay.move(projection) // to move one marker drawn
+   binding.bitmapOverlay.move(projection) // to move one bitmap drawn                 
+}
+
+mMap.setOnCameraMoveListener {
+   projections.forEach { // to move list of markers
+      binding.canvasOverlay.move(it)
+      binding.bitmapOverlay.move(it)
+   }                
+}
+```
+
+Canvas drawings are cheap but use carefully and inspect the performace thoroughly.
+
+And,
+
+**Do't forget to pause the animators when view isn't visible:**
+
+```
+override fun onResume() {
+   super.onResume()
+   binding.canvasOverlay.start()
+   binding.bitmapOverlay.start()
+}
+
+override fun onStop() {
+   super.onStop()
+   binding.canvasOverlay.pause()
+   binding.bitmapOverlay.pause()
+}
+```
