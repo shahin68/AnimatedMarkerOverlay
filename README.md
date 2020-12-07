@@ -5,10 +5,7 @@
 
 You can animate lot's of markers however you want.
 
-<video src="screens/1.mp4" width="320" height="200" controls preload></video>
-<video src="screens/2.mp4" width="320" height="200" controls preload></video>
-<video src="screens/3.mp4" width="320" height="200" controls preload></video>
-<video src="screens/4.mp4" width="320" height="200" controls preload></video>
+<img src="screens/1.gif" width="200"/> <img src="screens/2.gif" width="200"/> <img src="screens/3.gif" width="200"/> <img src="screens/4.gif" width="200"/>
 
 
 ## Usage
