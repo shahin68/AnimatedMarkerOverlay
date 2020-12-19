@@ -1,6 +1,15 @@
 # MarkerOverlay
 **Animate map markers with overlay projection compatible with clustering**
 
+**Tech:**
+
+* Kotlin 
+* MVVM architecture
+* Navigation ui
+* Google Maps
+* Koin
+* Coroutines
+
 ### What can you do with this package?
 
 You can animate lot's of markers however you want.
